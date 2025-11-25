@@ -1,6 +1,4 @@
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <UDashboardPanel id="gardening" :ui="{ body: 'lg:py-12' }">

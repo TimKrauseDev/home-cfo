@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { badge } from '#build/ui'
 import type { NavigationMenuItem } from '@nuxt/ui'
-import { FlowLegend } from '@unovis/ts'
 
 const route = useRoute()
 const toast = useToast()
@@ -165,20 +165,25 @@ const links = [[{
     }
   }]
 }, {
-  label: 'Inbox',
-  icon: 'i-lucide-inbox',
-  to: '/inbox',
-  badge: '4',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Customers',
-  icon: 'i-lucide-users',
-  to: '/customers',
-  onSelect: () => {
-    open.value = false
-  }
+  label: 'Backup',
+  to: '/',
+  icon: 'i-lucide-database',
+  defaultOpen: false,
+  type: 'trigger',
+  children: [{
+    label: 'Inbox',
+    to: '/inbox',
+    badge: '4',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Customer',
+    to: '/customers',
+    onSelect: () => {
+      open.value = false
+    }
+  }]
 }, {
   label: 'Settings',
   to: '/settings',
