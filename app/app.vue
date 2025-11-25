@@ -17,8 +17,8 @@ useHead({
   }
 })
 
-const title = 'Nuxt Dashboard Template'
-const description = 'A professional dashboard template built with Nuxt UI, featuring multiple pages, data visualization, and comprehensive management capabilities for creating powerful admin interfaces.'
+const title = 'Home CFO'
+const description = 'Home CFO is a personal finance management app. Take control of your finances with budgeting, expense tracking, and financial goal setting all in one place.'
 
 useSeoMeta({
   title,

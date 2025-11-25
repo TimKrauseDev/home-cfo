@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import { FlowLegend } from '@unovis/ts'
 
 const route = useRoute()
 const toast = useToast()
@@ -13,6 +14,156 @@ const links = [[{
   onSelect: () => {
     open.value = false
   }
+}, {
+  label: 'Budgeting',
+  to: '/budgeting',
+  icon: 'i-lucide-wallet',
+  defaultOpen: false,
+  type: 'trigger',
+  children: [{
+    label: 'Overview',
+    to: '/budgeting',
+    exact: true,
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Accounts',
+    to: '/budgeting/accounts',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Transactions',
+    to: '/budgeting/transactions',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Cash Flow',
+    to: '/budgeting/cash-flow',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Reports',
+    to: '/budgeting/reports',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Budget',
+    to: '/budgeting/budget',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Recurring',
+    to: '/budgeting/recurring',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Investments',
+    to: '/budgeting/investments',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: '20k Spending',
+    to: '/budgeting/20k-spending',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Savings Sectioning',
+    to: '/budgeting/savings-sectioning',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Statement Uploader',
+    to: '/budgeting/statement-uploader',
+    onSelect: () => {
+      open.value = false
+    }
+  }]
+}, {
+  label: 'Freelance',
+  to: '/freelance',
+  icon: 'i-lucide-briefcase',
+  defaultOpen: false,
+  type: 'trigger',
+  children: [{
+    label: 'Overview',
+    to: '/freelance',
+    exact: true,
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Earnings',
+    to: '/freelance/earnings',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Tasks',
+    to: '/freelance/tasks',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Clients',
+    to: '/freelance/clients',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Invoice Generator',
+    to: '/freelance/invoice-generator',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Time Tracker',
+    to: '/freelance/time-tracker',
+    onSelect: () => {
+      open.value = false
+    }
+  }]
+}, {
+  label: 'Gardening',
+  to: '/gardening',
+  icon: 'i-lucide-sprout',
+  defaultOpen: false,
+  type: 'trigger',
+  children: [{
+    label: 'Overview',
+    to: '/gardening',
+    exact: true,
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Inventory',
+    to: '/gardening/inventory',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Calendar',
+    to: '/gardening/calendar',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Tasks',
+    to: '/gardening/tasks',
+    onSelect: () => {
+      open.value = false
+    }
+  }]
 }, {
   label: 'Inbox',
   icon: 'i-lucide-inbox',
