@@ -22,7 +22,7 @@ const pageDescription = ref('View and manage all your financial transactions')
   <UPageCard variant="subtle">
     <div class="space-y-4">
       <p class="text-muted-foreground">
-        Your transactions will appear here.
+        Your transactions will appear here as table. Sort by transation, or year.
       </p>
     </div>
   </UPageCard>
