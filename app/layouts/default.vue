@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { badge } from '#build/ui'
 import type { NavigationMenuItem } from '@nuxt/ui'
+import HeaderLogo from '~/components/HeaderLogo.vue'
 
 const route = useRoute()
 const toast = useToast()
@@ -280,8 +281,8 @@ onMounted(async () => {
       class="bg-elevated/25"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
-      <template #header="{ collapsed }">
-        <TeamsMenu :collapsed="collapsed" />
+      <template #header>
+        <HeaderLogo />
       </template>
 
       <template #default="{ collapsed }">
