@@ -1,12 +1,9 @@
 import { useSupabase } from '@/composables/supabaseClient'
 import type { QueryData } from '@supabase/supabase-js'
 
-// export const getInstrumentsQuery = () => {
-//   const supabase = useSupabase();
-//   return supabase.from('instruments').select()
-// }
-
-// export type Instruments = QueryData<ReturnType<typeof getInstrumentsQuery>>
+/**
+ * Supabase Queries for Projects
+ */
 
 /** Get All Projects */
 export const getProjectsQuery = () => {
@@ -36,3 +33,36 @@ export const deleteProjectQuery = (id: string) => {
   return supabase.from('projects').delete().eq('id', id)
 }
 export type DeleteProject = QueryData<ReturnType<typeof deleteProjectQuery>>
+
+/**
+ * Supabase Queries for Tasks
+ */
+
+/** Get All Tasks */
+export const getTasksQuery = () => {
+  const supabase = useSupabase()
+  return supabase.from('tasks').select('*')
+}
+export type Tasks = QueryData<ReturnType<typeof getTasksQuery>>
+
+/** Get Single Task by ID */
+export const getTaskQuery = (id: string) => {
+  const supabase = useSupabase()
+  return supabase.from('tasks').select('*').eq('id', id).single()
+}
+export type Task = QueryData<ReturnType<typeof getTaskQuery>>
+
+/** Update Task by ID */
+export const updateTaskQuery = (id: string, data: Task) => {
+  console.log('Updating task with data:', data)
+  const supabase = useSupabase()
+  return supabase.from('tasks').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id)
+}
+export type UpdateTask = QueryData<ReturnType<typeof updateTaskQuery>>
+
+/** Delete Task by ID */
+export const deleteTaskQuery = (id: string) => {
+  const supabase = useSupabase()
+  return supabase.from('tasks').delete().eq('id', id)
+}
+export type DeleteTask = QueryData<ReturnType<typeof deleteTaskQuery>>
