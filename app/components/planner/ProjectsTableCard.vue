@@ -14,6 +14,14 @@ const router = useRouter()
 const deleteModalOpen = ref(false)
 const deleteProjectId = ref<string | null>(null)
 
+const refreshProjects = async () => {
+  await getProjects()
+}
+
+defineExpose({
+  refreshProjects
+})
+
 const sortedProjects = computed(() => {
   if (!projects.value) return []
 

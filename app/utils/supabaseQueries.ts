@@ -19,6 +19,23 @@ export const getProjectQuery = (id: string) => {
 }
 export type Project = QueryData<ReturnType<typeof getProjectQuery>>
 
+/** Create Project */
+export const createProjectQuery = (data: Partial<Project>) => {
+  if (!data.name) {
+    return { code: '500', error: 'Project name is required' }
+  }
+
+  const supabase = useSupabase()
+  return supabase.from('projects').insert([{
+    name: data.name,
+    description: data.description || '',
+    status: data.status || 'not-started',
+    due_date: data.due_date
+  }
+  ])
+}
+export type CreateProject = QueryData<ReturnType<typeof createProjectQuery>>
+
 /** Update Project by ID */
 export const updateProjectQuery = (id: string, data: Project) => {
   console.log('Updating project with data:', data)
