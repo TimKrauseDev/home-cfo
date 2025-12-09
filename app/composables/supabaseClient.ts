@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import type { Database } from '../../database/database.types'
 
 export const useSupabase = () => {
   const config = useRuntimeConfig()
@@ -6,8 +7,5 @@ export const useSupabase = () => {
   const supabaseUrl = config.public.supabaseUrl as string
   const supabasePublishableKey = config.public.supabasePublishableKey as string
 
-  console.log('Supabase URL:', supabaseUrl)
-  console.log('Supabase Publishable Key:', supabasePublishableKey)
-
-  return createClient(supabaseUrl, supabasePublishableKey)
+  return createClient<Database>(supabaseUrl, supabasePublishableKey)
 }

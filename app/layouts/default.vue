@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { badge } from '#build/ui'
 import type { NavigationMenuItem } from '@nuxt/ui'
 import HeaderLogo from '~/components/HeaderLogo.vue'
 
@@ -15,6 +14,33 @@ const links = [[{
   onSelect: () => {
     open.value = false
   }
+}, {
+  label: 'Planner',
+  to: '/planner',
+  icon: 'i-lucide-folder-open',
+  defaultOpen: true,
+  type: 'trigger',
+  children: [{
+    label: 'Overview',
+    to: '/planner',
+    exact: true,
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Projects',
+    to: '/planner/projects',
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Tasks',
+    to: '/planner/tasks',
+    onSelect: () => {
+      open.value = false
+    }
+  }]
+
 }, {
   label: 'Budgeting',
   to: '/budgeting',
