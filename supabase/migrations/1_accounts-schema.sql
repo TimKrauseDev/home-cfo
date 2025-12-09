@@ -1,4 +1,5 @@
 drop table if exists accounts;
+drop type if exists account_type;
 
 create type account_type as enum ('checking', 'savings', 'credit_card', 'investment', 'loan', 'other');
 
