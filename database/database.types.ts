@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       accounts: {
         Row: {
+          account_type: Database["public"]["Enums"]["account_type"]
           avatar_url: string | null
           balance: number
           created_at: string | null
@@ -25,6 +26,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          account_type: Database["public"]["Enums"]["account_type"]
           avatar_url?: string | null
           balance?: number
           created_at?: string | null
@@ -34,6 +36,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          account_type?: Database["public"]["Enums"]["account_type"]
           avatar_url?: string | null
           balance?: number
           created_at?: string | null
@@ -49,57 +52,140 @@ export type Database = {
           created_at: string | null
           id: string
           name: string
+          slug: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
           name: string
+          slug: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
           name?: string
+          slug?: string
           updated_at?: string | null
         }
         Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string
+          due_date: string | null
+          id: string
+          name: string
+          status: Database["public"]["Enums"]["project_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          id?: string
+          name: string
+          status?: Database["public"]["Enums"]["project_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          id?: string
+          name?: string
+          status?: Database["public"]["Enums"]["project_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          created_at: string
+          description: string
+          due_date: string | null
+          id: string
+          name: string
+          project_id: string | null
+          repeating_interval: number | null
+          repeating_type: Database["public"]["Enums"]["repeating_type"] | null
+          status: Database["public"]["Enums"]["tasks_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          id?: string
+          name: string
+          project_id?: string | null
+          repeating_interval?: number | null
+          repeating_type?: Database["public"]["Enums"]["repeating_type"] | null
+          status?: Database["public"]["Enums"]["tasks_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          id?: string
+          name?: string
+          project_id?: string | null
+          repeating_interval?: number | null
+          repeating_type?: Database["public"]["Enums"]["repeating_type"] | null
+          status?: Database["public"]["Enums"]["tasks_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
           account_id: string | null
           amount: number
-          category: string | null
+          category_id: string | null
           created_at: string | null
-          description: string | null
+          description: string
           id: string
           memo: string | null
           post_date: string
           transaction_date: string
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
           updated_at: string | null
         }
         Insert: {
           account_id?: string | null
           amount: number
-          category?: string | null
+          category_id?: string | null
           created_at?: string | null
-          description?: string | null
+          description: string
           id?: string
           memo?: string | null
           post_date: string
           transaction_date: string
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string | null
         }
         Update: {
           account_id?: string | null
           amount?: number
-          category?: string | null
+          category_id?: string | null
           created_at?: string | null
-          description?: string | null
+          description?: string
           id?: string
           memo?: string | null
           post_date?: string
           transaction_date?: string
+          transaction_type?: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string | null
         }
         Relationships: [
@@ -111,8 +197,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "transactions_category_fkey"
-            columns: ["category"]
+            foreignKeyName: "transactions_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
@@ -127,7 +213,34 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      account_type:
+        | "checking"
+        | "savings"
+        | "credit_card"
+        | "investment"
+        | "loan"
+        | "other"
+      project_status:
+        | "not-started"
+        | "in-progress"
+        | "completed"
+        | "on-hold"
+        | "perpetual"
+      repeating_type: "day" | "week" | "month" | "quarter" | "annual"
+      tasks_status:
+        | "not-started"
+        | "in-progress"
+        | "completed"
+        | "on-hold"
+        | "repeating"
+        | "perpetual"
+      transaction_type:
+        | "sale"
+        | "payment"
+        | "transfer"
+        | "refund"
+        | "fee"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -254,6 +367,39 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      account_type: [
+        "checking",
+        "savings",
+        "credit_card",
+        "investment",
+        "loan",
+        "other",
+      ],
+      project_status: [
+        "not-started",
+        "in-progress",
+        "completed",
+        "on-hold",
+        "perpetual",
+      ],
+      repeating_type: ["day", "week", "month", "quarter", "annual"],
+      tasks_status: [
+        "not-started",
+        "in-progress",
+        "completed",
+        "on-hold",
+        "repeating",
+        "perpetual",
+      ],
+      transaction_type: [
+        "sale",
+        "payment",
+        "transfer",
+        "refund",
+        "fee",
+        "other",
+      ],
+    },
   },
 } as const

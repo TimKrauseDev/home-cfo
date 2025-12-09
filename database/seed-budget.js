@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js'
 import { faker } from '@faker-js/faker'
 
 const runSeeder = {
-  seedAccounts: false,
-  seedCategories: false,
+  seedAccounts: true,
+  seedCategories: true,
   seedTransactions: true
 }
 
@@ -14,7 +14,7 @@ const supabase = createClient(
 
 /** SEED ACCOUNTS */
 const seedAccounts = async (numEntries) => {
-  console.log('Seeding accounts...')
+  console.log(`Seeding ${numEntries} accounts...`)
 
   const accounts = []
 
@@ -72,11 +72,13 @@ if (runSeeder.seedCategories) await seedCategories(10)
 
 /** SEED TRANSACTIONS */
 const seedTransactions = async (numEntries) => {
-  console.log('Seeding transactions...')
+  console.log(`Seeding ${numEntries} transactions...`)
+
   const transactions = []
 
   // Create array of company names for descriptions
   const companyNames = Array.from({ length: 6 }, () => faker.company.name())
+  // const transactionTypes = ['sale', 'payment', 'transfer', 'refund', 'fee', 'other']
 
   // Fetch existing account IDs
   const { data: accountsData, error: accountsError } = await supabase.from('accounts').select('id')
@@ -94,24 +96,31 @@ const seedTransactions = async (numEntries) => {
 
   // Generate transactions
   for (let i = 0; i < numEntries; i++) {
+    // Generate transaction_date within past year
     const transaction_date = faker.date.past(1).toISOString().split('T')[0]
     const transactionDateObj = new Date(transaction_date)
+
+    // Generate post_date within 0-8 days after transaction_date
     const postDateObj = new Date(transactionDateObj)
     postDateObj.setDate(transactionDateObj.getDate() + faker.number.int({ min: 0, max: 8 }))
     const post_date = postDateObj.toISOString().split('T')[0]
 
+    // Generate amount between -500 and 500
+    const amount = parseFloat(faker.finance.amount({ min: -500, max: 500, dec: 2 })) * faker.helpers.arrayElement([-1, 1])
+
     transactions.push({
       account_id: faker.helpers.arrayElement(accountsData).id,
       category_id: faker.helpers.arrayElement(categoriesData).id,
-      amount: parseFloat(faker.finance.amount({ min: 1, max: 500, dec: 2 })) * -1,
+      amount: amount,
       description: faker.helpers.arrayElement(companyNames),
+      transaction_type: amount >= 0 ? 'payment' : 'sale',
       memo: faker.lorem.sentence(),
       transaction_date: transaction_date,
       post_date: post_date
     })
   }
 
-  // // Insert transactions
+  // Insert transactions
   const { error } = await supabase.from('transactions').insert(transactions)
 
   if (error) {
