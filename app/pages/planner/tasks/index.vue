@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import TasksTableCard from '~/components/planner/TasksTableCard.vue'
+
 const pageTitle = ref('Tasks')
 const pageDescription = ref('Manage your project tasks and deadlines')
 </script>
@@ -19,11 +21,5 @@ const pageDescription = ref('Manage your project tasks and deadlines')
     />
   </UPageCard>
 
-  <UPageCard variant="subtle">
-    <div class="space-y-4">
-      <p class="text-muted-foreground">
-        Your project tasks will appear here.
-      </p>
-    </div>
-  </UPageCard>
+  <TasksTableCard />
 </template>

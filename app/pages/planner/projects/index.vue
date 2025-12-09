@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import ProjectsTableCard from '~/components/planner/ProjectsTableCard.vue'
+
 const pageTitle = ref('Projects')
 const pageDescription = ref('Manage and track your projects here.')
-
 </script>
 
 <template>
-  <UDropdownMenu />
   <UPageCard
     :title="pageTitle"
     :description="pageDescription"
@@ -22,5 +22,4 @@ const pageDescription = ref('Manage and track your projects here.')
   </UPageCard>
 
   <ProjectsTableCard />
-
 </template>
