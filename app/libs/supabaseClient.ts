@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '../../database/database.types'
 
-export const useSupabase = () => {
+export const createSupabaseClient = () => {
   const config = useRuntimeConfig()
 
   const supabaseUrl = config.public.supabaseUrl as string
