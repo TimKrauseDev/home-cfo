@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { CalendarDate } from '@internationalized/date'
 import ProjectsTableCard from '~/components/planner/ProjectsTableCard.vue'
+import InputDateWithPopover from '~/components/ui/InputDateWithPopover.vue'
 
 const pageTitle = ref('Projects')
 const pageDescription = ref('Manage and track your projects here.')
 const addModalOpen = ref(false)
-const inputDateRef = useTemplateRef('inputDateRef')
-const dateValue = shallowRef<CalendarDate | null>(null)
+const date = shallowRef<CalendarDate | null>(null)
 const tableRef = ref<InstanceType<typeof ProjectsTableCard> | null>(null)
 
 const toast = useToast()
@@ -26,20 +26,18 @@ const project = ref<Partial<Project>>({
 })
 
 const onSubmit = async () => {
-  console.log('Project date:', dateValue.value)
+  console.log('Project date:', date.value)
 
-  const year = dateValue.value?.year || 0
-  if (year < 1900 || year > 2100) dateValue.value = null
+  const year = date.value?.year || 0
+  if (year < 1900 || year > 2100) date.value = null
 
-  const dueDate = dateValue.value
-    ? new Date(
-        dateValue.value.year,
-        dateValue.value.month - 1,
-        dateValue.value.day
-      ).toISOString()
-    : null
+  if (date.value) {
+    const utcDate = new Date(Date.UTC(date.value.year, date.value.month - 1, date.value.day))
+    project.value.due_date = utcDate.toISOString()
+  } else {
+    project.value.due_date = null
+  }
 
-  project.value.due_date = dueDate
   console.log('Form submitted:', project)
 
   const { error } = await createProjectQuery(project.value)
@@ -129,27 +127,7 @@ const onSubmit = async () => {
               class="flex flex-col items-start gap-2"
               :ui="{ container: 'w-full' }"
             >
-              <UInputDate
-                ref="inputDateRef"
-                v-model="dateValue"
-                class="w-full"
-              >
-                <template #trailing>
-                  <UPopover :reference="inputDateRef?.inputsRef[3]?.$el">
-                    <UButton
-                      color="neutral"
-                      variant="link"
-                      size="sm"
-                      icon="i-lucide-calendar"
-                      aria-label="Select a date"
-                      class="px-0"
-                    />
-                    <template #content>
-                      <UCalendar v-model="dateValue" class="p-2" />
-                    </template>
-                  </UPopover>
-                </template>
-              </UInputDate>
+              <InputDateWithPopover v-model="date" />
             </UFormField>
             <UFormField
               name="description"

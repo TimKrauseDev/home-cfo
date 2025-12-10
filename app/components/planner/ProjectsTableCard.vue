@@ -42,6 +42,8 @@ const sortedProjects = computed(() => {
 const getProjects = async () => {
   const { data, error } = await getProjectsQuery()
 
+  console.log('Fetched projects:', data)
+
   if (error) {
     console.error('Error fetching projects:', error.message)
     return
@@ -80,7 +82,7 @@ const formatDate = (dateString: string) => {
   if (!dateString) return ''
 
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', { dateStyle: 'medium' })
+  return date.toLocaleDateString('en-US', { dateStyle: 'medium', timeZone: 'UTC' })
 }
 
 const columns: TableColumn<Projects[0]>[] = [

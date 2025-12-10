@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { CalendarDate } from '@internationalized/date'
+import InputDateWithPopover from '~/components/ui/InputDateWithPopover.vue'
 
 const pageTitle = ref('Project Details')
 const id = useRoute().params.id as string
 
 const project = ref<Project | null>(null)
+const date = shallowRef<CalendarDate | null>(null)
 const deleteModalOpen = ref(false)
 
 const statusOptions = ref([
@@ -15,27 +17,20 @@ const statusOptions = ref([
   { label: 'Perpetual', value: 'perpetual' }
 ])
 
-const inputDateRef = useTemplateRef('inputDateRef')
-
-const dateValue = shallowRef<CalendarDate | null>(null)
-
 const onSubmit = async () => {
   if (!project.value) return
   console.log('Form submitted:', project.value)
-  console.log('Project date:', dateValue.value)
+  console.log('project date:', date.value)
 
-  const year = dateValue.value?.year || 0
-  if (year < 1900 || year > 2100) dateValue.value = null
+  const year = date.value?.year || 0
+  if (year < 1900 || year > 2100) date.value = null
 
-  const dueDate = dateValue.value
-    ? new Date(
-        dateValue.value.year,
-        dateValue.value.month - 1,
-        dateValue.value.day
-      ).toISOString()
-    : null
-
-  project.value.due_date = dueDate
+  if (date.value) {
+    const utcDate = new Date(Date.UTC(date.value.year, date.value.month - 1, date.value.day))
+    project.value.due_date = utcDate.toISOString()
+  } else {
+    project.value.due_date = null
+  }
 
   const { error } = await updateProjectQuery(project.value.id, project.value)
 
@@ -72,11 +67,11 @@ onMounted(async () => {
     project.value = data
 
     if (data.due_date) {
-      const dueDate = new Date(data.due_date)
-      dateValue.value = new CalendarDate(
-        dueDate.getFullYear(),
-        dueDate.getMonth() + 1,
-        dueDate.getDate()
+      const currDate = new Date(data.due_date)
+      date.value = new CalendarDate(
+        currDate.getUTCFullYear(),
+        currDate.getUTCMonth() + 1,
+        currDate.getUTCDate()
       )
     }
   }
@@ -173,23 +168,7 @@ onMounted(async () => {
           label="Due Date"
           class="flex max-sm:flex-col justify-between items-start gap-4"
         >
-          <UInputDate ref="inputDateRef" v-model="dateValue">
-            <template #trailing>
-              <UPopover :reference="inputDateRef?.inputsRef[3]?.$el">
-                <UButton
-                  color="neutral"
-                  variant="link"
-                  size="sm"
-                  icon="i-lucide-calendar"
-                  aria-label="Select a date"
-                  class="px-0"
-                />
-                <template #content>
-                  <UCalendar v-model="dateValue" class="p-2" />
-                </template>
-              </UPopover>
-            </template>
-          </UInputDate>
+          <InputDateWithPopover v-model="date" />
         </UFormField>
         <UFormField
           name="description"
