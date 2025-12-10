@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Projects } from '~/utils/supabaseQueries'
 import { h, resolveComponent } from 'vue'
+import { useProjectsStore } from '~/stores/projectsStore'
+import type { Projects } from '~/utils/supabaseQueries'
 import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
 import type { Row } from '@tanstack/vue-table'
 
@@ -8,81 +9,30 @@ const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 
+const projectsStore = useProjectsStore()
+const { projects } = storeToRefs(projectsStore)
+const { deleteProject } = projectsStore
+
 const toast = useToast()
-const projects = ref<Projects | null>(null)
 const router = useRouter()
+
 const deleteModalOpen = ref(false)
 const deleteProjectId = ref<string | null>(null)
+const deleteProjectName = ref<string | null>(null)
 
-const refreshProjects = async () => {
-  await getProjects()
-}
-
-defineExpose({
-  refreshProjects
-})
-
-const sortedProjects = computed(() => {
-  if (!projects.value) return []
-
-  return [...projects.value].sort((a, b) => {
-    // Primary sort: due date (ascending, nulls last)
-    const dateA = a.due_date ? new Date(a.due_date).getTime() : Number.MAX_SAFE_INTEGER
-    const dateB = b.due_date ? new Date(b.due_date).getTime() : Number.MAX_SAFE_INTEGER
-
-    if (dateA !== dateB) {
-      return dateA - dateB
-    }
-
-    // Secondary sort: project name (alphabetically)
-    return a.name.localeCompare(b.name)
-  })
-})
-
-const getProjects = async () => {
-  const { data, error } = await getProjectsQuery()
-
-  console.log('Fetched projects:', data)
-
-  if (error) {
-    console.error('Error fetching projects:', error.message)
-    return
-  }
-
-  projects.value = data
-}
-
-const onDelete = async (id: string) => {
-  if (!id) return
-
-  const projectToDelete = projects.value?.find(p => p.id === id)
-  if (!projectToDelete) return
-
-  console.log('Delete project:', projectToDelete.name)
-
-  const { error } = await deleteProjectQuery(projectToDelete.id)
-
-  if (error) {
-    console.error('Error deleting project:', error)
-    return
-  }
-
+const onDelete = async (id: string | null, name: string | null) => {
   deleteModalOpen.value = false
 
+  if (!id || !name) return
+
+  const success = await deleteProject(id)
+  if (!success) return
+
   toast.add({
-    title: `Deleted project: ${projectToDelete.name}`,
-    color: 'error',
+    title: `Deleted project: ${name}`,
+    color: 'success',
     icon: 'i-lucide-trash-2'
   })
-
-  await getProjects()
-}
-
-const formatDate = (dateString: string) => {
-  if (!dateString) return ''
-
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', { dateStyle: 'medium', timeZone: 'UTC' })
 }
 
 const columns: TableColumn<Projects[0]>[] = [
@@ -131,7 +81,7 @@ const columns: TableColumn<Projects[0]>[] = [
       })
     },
     cell: ({ row }) => {
-      return h('div', { class: 'text-center' }, formatDate(row.getValue('due_date')))
+      return h('div', { class: 'text-center' }, DateUtils.tableColumnDateFormat(row.getValue('due_date')))
     }
   },
   {
@@ -152,7 +102,6 @@ const columns: TableColumn<Projects[0]>[] = [
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
     },
-    // header: () => h('div', { class: 'font-medium text-center' }, 'Status'),
     cell: ({ row }) => {
       const status = row.getValue('status') as string
       let color = 'neutral'
@@ -227,28 +176,19 @@ function getRowItems(row: Row<Projects[0]>): DropdownMenuItem[] {
     {
       label: 'Delete',
       onClick() {
-        // onDelete(row.original.id)
-        // toast.add({
-        //   title: `Deleted project: ${row.original.name}`,
-        //   color: 'error',
-        //   icon: 'i-lucide-trash-2'
-        // })
         deleteModalOpen.value = true
         deleteProjectId.value = row.original.id
+        deleteProjectName.value = row.original.name
       }
     }
   ]
 }
-
-onMounted(() => {
-  getProjects()
-})
 </script>
 
 <template>
   <UPageCard variant="subtle" class="overflow-scroll">
     <UTable
-      :data="sortedProjects"
+      :data="projects ?? []"
       :columns="columns"
       class="flex-1"
     />
@@ -265,7 +205,7 @@ onMounted(() => {
           Please confirm you would like to delete the following project:
         </p>
         <p class="font-bold">
-          {{ projects?.find(p => p.id === deleteProjectId)?.name }}
+          {{ deleteProjectName }}
         </p>
       </div>
     </template>
@@ -273,7 +213,7 @@ onMounted(() => {
       <UButton
         label="Delete"
         color="error"
-        @click="onDelete(deleteProjectId || '')"
+        @click="onDelete(deleteProjectId, deleteProjectName)"
       />
       <UButton
         label="Cancel"

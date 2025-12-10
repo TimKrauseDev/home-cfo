@@ -1,68 +1,36 @@
 <script setup lang="ts">
-import type { CalendarDate } from '@internationalized/date'
+// import type { CalendarDate } from '@internationalized/date'
 import ProjectsTableCard from '~/components/planner/ProjectsTableCard.vue'
-import InputDateWithPopover from '~/components/ui/InputDateWithPopover.vue'
+// import InputDateWithPopover from '~/components/ui/InputDateWithPopover.vue'
+// import { useSelectStatus } from '@/composables/useSelectOptions'
+import ProjectAddButton from '~/components/planner/ProjectAddButton.vue'
+
+// const { projectStatusOptions } = useSelectStatus()
 
 const pageTitle = ref('Projects')
 const pageDescription = ref('Manage and track your projects here.')
-const addModalOpen = ref(false)
-const date = shallowRef<CalendarDate | null>(null)
-const tableRef = ref<InstanceType<typeof ProjectsTableCard> | null>(null)
+// const addModalOpen = ref(false)
+// const date = shallowRef<CalendarDate | null>(null)
+// const tableRef = ref<InstanceType<typeof ProjectsTableCard> | null>(null)
 
-const toast = useToast()
-const statusOptions = ref([
-  { label: 'Not Started', value: 'not-started' },
-  { label: 'In Progress', value: 'in-progress' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'On Hold', value: 'on-hold' },
-  { label: 'Perpetual', value: 'perpetual' }
-])
+// const toast = useToast()
 
-const project = ref<Partial<Project>>({
-  name: '',
-  status: 'not-started',
-  due_date: null,
-  description: ''
-})
+// const project = ref<Partial<Project>>({
+//   name: '',
+//   status: 'not-started',
+//   due_date: null,
+//   description: ''
+// })
 
-const onSubmit = async () => {
-  console.log('Project date:', date.value)
-
-  const year = date.value?.year || 0
-  if (year < 1900 || year > 2100) date.value = null
-
-  if (date.value) {
-    const utcDate = new Date(Date.UTC(date.value.year, date.value.month - 1, date.value.day))
-    project.value.due_date = utcDate.toISOString()
-  } else {
-    project.value.due_date = null
-  }
-
-  console.log('Form submitted:', project)
-
-  const { error } = await createProjectQuery(project.value)
-
-  if (error) {
-    console.error('Error updating project:', error)
-    return
-  }
-
-  toast.add({
-    title: 'Project Created',
-    description: 'The project has been created successfully.',
-    color: 'success'
-  })
-
-  addModalOpen.value = false
-  project.value = {
-    name: '',
-    status: 'not-started',
-    due_date: null,
-    description: ''
-  }
-
-  if (tableRef.value) tableRef.value.refreshProjects()
-}
+// const resetProjectForm = () => {
+//   project.value = {
+//     name: '',
+//     status: 'not-started',
+//     due_date: null,
+//     description: ''
+//   }
+//   date.value = null
+// }
 </script>
 
 <template>
@@ -73,7 +41,8 @@ const onSubmit = async () => {
     orientation="horizontal"
     class="mb-4"
   >
-    <UDrawer
+    <ProjectAddButton />
+    <!-- <UDrawer
       direction="right"
       :open="addModalOpen"
       title="Add New Project"
@@ -117,7 +86,7 @@ const onSubmit = async () => {
             >
               <USelect
                 v-model="project.status"
-                :items="statusOptions"
+                :items="projectStatusOptions"
                 class="w-full"
               />
             </UFormField>
@@ -152,8 +121,8 @@ const onSubmit = async () => {
           </div>
         </UForm>
       </template>
-    </UDrawer>
+    </UDrawer> -->
   </UPageCard>
 
-  <ProjectsTableCard ref="tableRef" />
+  <ProjectsTableCard />
 </template>

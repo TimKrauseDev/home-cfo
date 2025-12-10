@@ -1,79 +1,56 @@
 <script setup lang="ts">
-import { CalendarDate } from '@internationalized/date'
+import type { CalendarDate } from '@internationalized/date'
 import InputDateWithPopover from '~/components/ui/InputDateWithPopover.vue'
+import { useSelectStatus } from '@/composables/useSelectOptions'
+import { useProjectsStore } from '~/stores/projectsStore'
 
 const pageTitle = ref('Project Details')
 const id = useRoute().params.id as string
 
-const project = ref<Project | null>(null)
-const date = shallowRef<CalendarDate | null>(null)
-const deleteModalOpen = ref(false)
+const router = useRouter()
+const toast = useToast()
 
-const statusOptions = ref([
-  { label: 'Not Started', value: 'not-started' },
-  { label: 'In Progress', value: 'in-progress' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'On Hold', value: 'on-hold' },
-  { label: 'Perpetual', value: 'perpetual' }
-])
+const projectStore = useProjectsStore()
+const { project } = storeToRefs(projectStore)
+const { getProject, updateProject, deleteProject } = projectStore
+
+const { projectStatusOptions } = useSelectStatus()
+
+const date = shallowRef<CalendarDate | null>(null)
+
+const deleteModalOpen = ref(false)
 
 const onSubmit = async () => {
   if (!project.value) return
-  console.log('Form submitted:', project.value)
-  console.log('project date:', date.value)
 
   const year = date.value?.year || 0
-  if (year < 1900 || year > 2100) date.value = null
+  if (!DateUtils.validateYear(year)) date.value = null
 
-  if (date.value) {
-    const utcDate = new Date(Date.UTC(date.value.year, date.value.month - 1, date.value.day))
-    project.value.due_date = utcDate.toISOString()
-  } else {
-    project.value.due_date = null
-  }
+  project.value.due_date = date.value
+    ? DateUtils.calendarDateToUTCDateISO(date.value)
+    : null
 
-  const { error } = await updateProjectQuery(project.value.id, project.value)
+  const success = await updateProject(project.value.id, project.value)
 
-  if (error) {
-    console.error('Error updating project:', error)
-    return
-  }
+  if (!success) return
+
+  toast.add({
+    title: 'Project Updated',
+    description: 'The project has been updated successfully.',
+    color: 'success'
+  })
 }
 
 const onDelete = async () => {
-  if (!project.value) return
-  console.log('Delete project:', project.value)
-
-  const { error } = await deleteProjectQuery(project.value.id)
-
-  if (error) {
-    console.error('Error deleting project:', error)
-    return
-  }
-
-  const router = useRouter()
+  await deleteProject(id)
   router.push('/planner/projects')
 }
 
 onMounted(async () => {
-  const { data, error } = await getProjectQuery(id)
+  await getProject(id)
 
-  if (error) {
-    console.error('Error fetching project:', error)
-    return
-  }
-  if (data) {
-    console.log('Fetched project data:', data)
-    project.value = data
-
-    if (data.due_date) {
-      const currDate = new Date(data.due_date)
-      date.value = new CalendarDate(
-        currDate.getUTCFullYear(),
-        currDate.getUTCMonth() + 1,
-        currDate.getUTCDate()
-      )
-    }
+  if (project.value?.due_date) {
+    date.value = DateUtils.UTCDateISOToCalendarDate(project.value.due_date)
   }
 })
 </script>
@@ -160,7 +137,7 @@ onMounted(async () => {
         >
           <USelect
             v-model="project.status"
-            :items="statusOptions"
+            :items="projectStatusOptions"
           />
         </UFormField>
         <UFormField
