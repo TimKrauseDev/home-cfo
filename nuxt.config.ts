@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@vueuse/nuxt',
-    '@nuxt/test-utils'
+    '@nuxt/test-utils',
+    '@pinia/nuxt'
   ],
 
   devtools: {
@@ -37,5 +38,9 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
+  },
+
+  pinia: {
+    storesDirs: ['stores']
   }
 })
